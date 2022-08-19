@@ -35,4 +35,5 @@ def get_proxies():
 
 
 if __name__ == '__main__':
+    print(get_random_user_agent())
     print(get_proxies())
