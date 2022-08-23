@@ -1,8 +1,10 @@
+import logging
+from datetime import datetime
+
 from peewee import (SqliteDatabase, Model, CharField,
                     DateField, BooleanField, FloatField)
-from datetime import datetime
+
 from config import DATABASE
-import logging
 
 db = SqliteDatabase(DATABASE)
 

@@ -1,6 +1,7 @@
+import logging
+
 import requests
 from bs4 import BeautifulSoup as bs
-import logging
 
 from config import PROXY_URL
 from .user_agent import get_random_user_agent

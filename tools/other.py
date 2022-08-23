@@ -1,7 +1,3 @@
-import logging
-import time
-
-
 def get_title(content):
     """
     Получаем полное название фильма
