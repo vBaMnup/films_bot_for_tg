@@ -3,10 +3,11 @@ from bs4 import BeautifulSoup as bs
 import logging
 
 from config import PROXY_URL
-from user_agent import get_random_user_agent
+from .user_agent import get_random_user_agent
 
 
 def get_proxies():
+    logging.info('Пробую получить список прокси с сайта')
     parsed_proxies_list = bs(requests.get(
         PROXY_URL,
         headers=get_random_user_agent()
@@ -31,6 +32,7 @@ def get_proxies():
             proxies.append(host)
         except IndexError as error:
             logging.error(error)
+    logging.info('Список прокси получен')
     return proxies
 
 

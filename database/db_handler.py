@@ -55,16 +55,19 @@ def save_db(url, name, description, review, poster, tracker_url, download, ganr,
         logging.info('Сохраняю фильм в базу')
 
 
-def add_similar_films(url_tracker, url_kp, name, download):
+def add_similar_films(url_kp, name, download):
     logging.info('Поиск похожих фильмов')
     if Films.select().where(Films.kinopoisk_url == url_kp).exists():
         film = Films.get(Films.kinopoisk_url == url_kp)
-        if not check_db_tracker(url_tracker):
-            if name not in film.similar_films:
-                Films.update(
-                    similar_films=Films.similar_films
-                    + f'{name} {download}|'
-                ).where(Films.kinopoisk_url == url_kp).execute()
-                logging.info('Сохраняю список похожих фильмов')
-            logging.info('Фильм есть в списке')
+        if name not in film.similar_films:
+            Films.update(
+                similar_films=Films.similar_films
+                + f'{name} {download}|'
+            ).where(Films.kinopoisk_url == url_kp).execute()
+            logging.info('Сохраняю список похожих фильмов')
+        logging.info('Фильм есть в списке')
 
+
+if __name__ == '__main__':
+    Films.create_table()
+    # print(check_db_tracker('http://rutor.info/torrent/885241/bystree-puli_bullet-train-2022-ts-avc-d'))
