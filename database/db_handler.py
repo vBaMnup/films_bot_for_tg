@@ -60,8 +60,16 @@ def save_db(url, name, description, review, poster, tracker_url, download, ganr,
 def add_similar_films(url_kp, name, download):
     logging.info('Поиск похожих фильмов')
     if Films.select().where(Films.kinopoisk_url == url_kp).exists():
+        logging.info('Фильм есть в базе')
         film = Films.get(Films.kinopoisk_url == url_kp)
+        print(film.similar_films)
+        if not film.similar_films:
+            Films.update(
+                similar_films=Films.similar_films
+                              + f'{name} {download}|'
+            ).where(Films.kinopoisk_url == url_kp).execute()
         if name not in film.similar_films:
+            logging.info('Пробую добавить в похожие')
             Films.update(
                 similar_films=Films.similar_films
                 + f'{name} {download}|'

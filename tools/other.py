@@ -13,11 +13,14 @@ def get_google_query(title):
     :param title:
     :return:
     """
-    title_split = title[0].strip().split('(')
-    header = title_split[0].strip().split(" / ")
-    if len(header) >= 2:
-        return (
-            f'https://www.google.com/search?'
-            f'q=кинопоиск+{header[0]}+{header[1]}'
-        )
-    return f'https://www.google.com/search?q=кинопоиск+{title_split}'
+    print(title)
+    if title:
+        title_split = title[0].strip().split('(')
+        header = title_split[0].strip().split(" / ")
+        if len(header) >= 2:
+            return (
+                f'https://www.google.com/search?'
+                f'q=кинопоиск+{header[0]}+{header[1]}'
+            )
+        return f'https://www.google.com/search?q=кинопоиск+{title_split}'
+    assert Exception('Пустой тайтл')

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 # Логирование
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 # подготавливаемся к работе с dotenv
 load_dotenv()
@@ -24,3 +24,6 @@ TRACKER_PARSING_URL = (
     + f'{datetime.strftime(datetime.now() - timedelta(days=1), "%d.%m.%Y")};'
       f'{datetime.strftime(datetime.now(), "%d.%m.%Y")}'
 )
+
+# Таймаут соединения
+TIMEOUT = 5
