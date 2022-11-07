@@ -68,11 +68,10 @@ class Kparser:
                         sc = script.text()
                         sc = unquote(sc)
                         data = json.loads(sc)
-                        with open('data.json', 'w', encoding='utf-8') as f:
-                            json.dump(data, f, ensure_ascii=False)
                         logging.info('Удалось получить JSON с кинопоиска')
                         return data
                 logging.error('В ответе нет нужного скрипта')
+                time.sleep(15)
             except Exception:
                 logging.error('Не удалось получить JSON с кинопоиска')
                 time.sleep(15)
@@ -100,7 +99,7 @@ class Kparser:
         else:
             ganr = 'Нет данных'
         if "countryOfOrigin" in data:
-            country = data.get("countryOfOrigin")
+            country = [*data.get("countryOfOrigin")]
         else:
             country = 'Нет данных'
         if "datePublished" in data:
