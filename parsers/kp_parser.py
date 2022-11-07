@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from urllib.parse import unquote
 
 from requests import Session
@@ -67,11 +68,14 @@ class Kparser:
                         sc = script.text()
                         sc = unquote(sc)
                         data = json.loads(sc)
+                        with open('data.json', 'w', encoding='utf-8') as f:
+                            json.dump(data, f, ensure_ascii=False)
                         logging.info('Удалось получить JSON с кинопоиска')
                         return data
                 logging.error('В ответе нет нужного скрипта')
             except Exception:
                 logging.error('Не удалось получить JSON с кинопоиска')
+                time.sleep(15)
 
     def get_content(self, data):
         logging.info('Собираю информацию о фильме')
@@ -88,21 +92,30 @@ class Kparser:
         else:
             ocenka = '-'
         if "image" in data:
-            img = data.get("image").split(':')[1]
+            img = 'https:' + data.get("image").split(':')[1]
         else:
             img = 'Пусто'
         if 'genre' in data:
-            ganr1 = data.get("genre")
-            ganr = ', '.join(ganr1)
+            ganr = data.get("genre")
         else:
             ganr = 'Нет данных'
         if "countryOfOrigin" in data:
-            country1 = data.get("countryOfOrigin")
-            country = ', '.join(country1)
+            country = data.get("countryOfOrigin")
         else:
             country = 'Нет данных'
+        if "datePublished" in data:
+            year = int(data.get("datePublished"))
+        else:
+            year = 0
+        if "actor" in data:
+            actors = []
+            actor_data = data.get("actor")
+            for i in actor_data:
+                actors.append(i.get("name"))
+        else:
+            actors = 'Нет данных'
         logging.info('Информация о фильме собрана')
-        return name, description, ocenka, img, ganr, country
+        return name, description, ocenka, img, ganr, country, year, actors
 
 
 def kino_main(url):
