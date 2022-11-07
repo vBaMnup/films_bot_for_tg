@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from config import TRACKER_DOMEN, TRACKER_PARSING_URL, TIMEOUT
 from database.db_handler import Queue, Films
 from kp_parser import kino_main
-from tools.other import get_google_query
+from tools.other import get_google_query, make_link
 from tools.user_agent import get_random_user_agent
 
 
@@ -19,7 +19,7 @@ class ParserNoProxy:
 
     def get_films(self) -> bool:
         """
-        Получаю список новых фильмов на треккере
+        Получить список новых фильмов на трекере
         :return:
         """
         while True:
@@ -48,11 +48,21 @@ class ParserNoProxy:
                 time.sleep(60)
 
     def get_next_film(self):
+        """
+        Выбрать фильм на обработку
+        :return: id, название, ссылку на трекере, магнет-ссылку из очереди
+        """
         self.get_films()
         film_id, title, tracker_link, download = self.queue.get_next_film_from_queue()
         return film_id, title, tracker_link, download
 
     def search_kplink_in_google(self, google_url, title):
+        """
+        Поиск в гугле ссылки на кинопоиск
+        :param google_url: Поисковый запрос
+        :param title: Название
+        :return: Ссылка на кинопоиск
+        """
         while True:
             logging.info(f'Ищу ссылку в гугле на {title}')
             headers = get_random_user_agent()
@@ -78,8 +88,7 @@ class ParserNoProxy:
                         if link is None:
                             break
                         if '/film/' in link and 'kinopoisk' in link:
-                            s = link.strip().split('/')
-                            kino_link = f'{s[0]}//{s[2]}/{s[3]}/{s[4]}/'
+                            kino_link = make_link(link)
                             logging.info(f'Ура: {kino_link}')
                             return kino_link
                 logging.error('Отсутствует ссылка на кинопоиск, пробую еще...')
@@ -87,6 +96,10 @@ class ParserNoProxy:
 
 
 def main():
+    """
+    Основная логика программы
+    :return:
+    """
     a = ParserNoProxy()
     f = Films()
     q = Queue()

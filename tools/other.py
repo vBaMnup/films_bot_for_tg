@@ -1,22 +1,25 @@
+import logging
+
+
 def get_title(content):
     """
-    Получаем полное название фильма
-    :param content: Контент страницы фильма
-    :return: название
+    Получение тайтла
+    :param content:
+    :return:
     """
-    return content.xpath('//body//h1/text()')
+    logging.info(content)
+    return content.xpath('//body//h1/text()')[0]
 
 
-def get_google_query(title):
+def get_google_query(title: str) -> str:
     """
-    Создаем запрос в гугл из полного названия фильма
+    Создание запроса в гугл
     :param title:
     :return:
     """
-    print(title)
     if title:
-        title_split = title[0].strip().split('(')
-        header = title_split[0].strip().split(" / ")
+        title_split: list = title.split('(')
+        header: list = title_split[0].strip().split(" / ")
         if len(header) >= 2:
             return (
                 f'https://www.google.com/search?'
@@ -24,3 +27,9 @@ def get_google_query(title):
             )
         return f'https://www.google.com/search?q=кинопоиск+{title_split}'
     assert Exception('Пустой тайтл')
+
+
+def make_link(string: str) -> str:
+    s: list = string.strip().split('/')
+    kino_link: str = f'{s[0]}//{s[2]}/{s[3]}/{s[4]}/'
+    return kino_link
