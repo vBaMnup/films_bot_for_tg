@@ -1,10 +1,6 @@
 import logging
 import psycopg2
 from datetime import datetime
-from time import time
-
-from peewee import (PostgresqlDatabase, Model, CharField,
-                    DateField, BooleanField, FloatField)
 
 from config import user, password, host, db_name
 
@@ -43,13 +39,23 @@ class Queue:
         with self.connection_to_db().cursor() as cursor:
             cursor.execute(
                 """
-                    SELECT title, link, download
+                    SELECT id, title, link, download
                     FROM queue
                     WHERE handled = FALSE
                     LIMIT 1;
                 """
             )
             return cursor.fetchone()
+
+    def change_handled(self, id):
+        with self.connection_to_db().cursor() as cursor:
+            cursor.execute(
+                f"""
+                    UPDATE queue
+                    SET handled = TRUE
+                    WHERE id = {id}
+                """
+            )
 
     def clear_queue(self):
         with self.connection_to_db().cursor() as cursor:
@@ -60,91 +66,117 @@ class Queue:
             )
 
 
+class Films:
+    def __init__(self):
+        self.user = user
+        self.password = password
+        self.host = host
+        self.db_name = db_name
 
-# psql_db = PostgresqlDatabase(
-#     db_name,
-#     user=user
-# )
-#
-#
-# class BaseModel(Model):
-#     class Meta:
-#         database = psql_db
-#
-#
-# class Films(ModelBase):
-#     name = CharField()
-#     description = CharField()
-#     review = FloatField()
-#     poster = CharField()
-#     tracker_url = CharField()
-#     ganr = CharField()
-#     country = CharField()
-#     kinopoisk_url = CharField()
-#     download = CharField()
-#     parse_date = DateField()
-#     posted = BooleanField()
-#     similar_films = CharField(null=True)
-#
-#
-# def check_db_tracker(url):
-#     logging.info('Проверяю ссылку на треккер в базе')
-#     return Films.select().where(Films.tracker_url == url).exists()
-#
-#
-# def check_db_kp(url):
-#     logging.info('Проверяю ссылку на кп в базе')
-#     return Films.select().where(Films.kinopoisk_url == url).exists()
-#
-#
-# def save_db(url, name, description, review, poster, tracker_url, download, ganr, country):
-#     if url:
-#         film_new = Films(name=name,
-#                          description=description,
-#                          review=review,
-#                          poster=poster,
-#                          tracker_url=tracker_url,
-#                          ganr=ganr,
-#                          country=country,
-#                          kinopoisk_url=url,
-#                          download=download,
-#                          parse_date=datetime.strftime(datetime.now(),
-#                                                       "%d.%m.%Y"),
-#                          posted=False)
-#         film_new.save()
-#         logging.info('Сохраняю фильм в базу')
-#
-#
-# def add_similar_films(url_kp, name, download):
-#     logging.info('Поиск похожих фильмов')
-#     if Films.select().where(Films.kinopoisk_url == url_kp).exists():
-#         logging.info('Фильм есть в базе')
-#         film = Films.get(Films.kinopoisk_url == url_kp)
-#         if film.similar_films is None:
-#             logging.info('Создаю список похожих')
-#             try:
-#                 Films.update(
-#                     similar_films=Films.similar_films
-#                     + f'{name} {download}|'
-#                 ).where(Films.kinopoisk_url == url_kp).execute()
-#             except Exception as e:
-#                 print(e)
-#             logging.info('Фильм добавлен в список похожих')
-#         elif name not in film.similar_films:
-#             logging.info('Пробую добавить в похожие')
-#             Films.update(
-#                 similar_films=Films.similar_films
-#                 + f'{name} {download}|'
-#             ).where(Films.kinopoisk_url == url_kp).execute()
-#             logging.info('Сохраняю список похожих фильмов')
-#         else:
-#             logging.info('Фильм есть в списке')
-#
-#
+    def connection_to_db(self):
+        try:
+            connection = psycopg2.connect(
+                host=host,
+                user=user,
+                password=password,
+                database=db_name
+            )
+            connection.autocommit = True
+        except Exception as _ex:
+            print('[INFO] Error while working with PSQL', _ex)
+        return connection
 
-if __name__ == '__main__':
-    title = 'Поехали! / En roue libre (2022) WEB-DL 1080p от селезень | D'
-    url = 'http://rutor.info/torrent/894705/poehali!_en-roue-libre-2022-web-dl-1080p-ot-selezen-d'
-    download = 'magnet:?xt=urn:btih:b8c7bb418aa14458f4aaefb399451f172a1eaa75&dn=rutor.info_%D0%9F%D0%BE%D0%B5%D1%85%D0%B0%D0%BB%D0%B8%21+%2F+En+roue+libre+%282022%29+WEB-DL+1080p+%D0%BE%D1%82+%D1%81%D0%B5%D0%BB%D0%B5%D0%B7%D0%B5%D0%BD%D1%8C+%7C+D&tr=udp://opentor.net:6969&tr=http://retracker.local/announce'
-    p = Queue()
-    p.insert_to_database(title, url, download)
+    def check_data_in_db(self, db_name, data, column):
+        try:
+            with self.connection_to_db().cursor() as cursor:
+                cursor.execute(
+                    f"""
+                        SELECT {column}
+                        FROM {db_name}
+                        WHERE {column} = '{data}'
+                    """
+                )
+                result = cursor.fetchone()[0]
+                return result == data
+        except TypeError:
+            return False
+
+    def insert_to_mediator(self, db_mediator_name, db2_name,
+                           name_mediator2, id_name2,
+                           column_name2, data1, data2):
+        with self.connection_to_db().cursor() as cursor:
+            cursor.execute(
+                f"""
+                    INSERT INTO {db_mediator_name} (film_id, {name_mediator2})
+                    VALUES ((SELECT id FROM films WHERE title = '{data1}'),
+                        (SELECT {id_name2} FROM {db2_name} WHERE {column_name2} = '{data2}'))
+                """
+            )
+            logging.info('Таблица Mediator дополнена')
+
+    def insert_to_films(self, title, description, ocenka, year, poster,
+                        tracker_page, kino_page, download, ganres, actors,
+                        countries):
+        self.insert_to_table('ganre', 'ganre_name', ganres)
+        self.insert_to_table('actors', 'name', actors)
+        self.insert_to_table('country', 'country', countries)
+        self.insert_similar(title, download)
+        if not self.check_data_in_db('films', title, 'title'):
+            with self.connection_to_db().cursor() as cursor:
+                cursor.execute(
+                    f"""
+                        INSERT INTO films (title,
+                            description,
+                            ocenka,
+                            year,
+                            poster,
+                            tracker_page,
+                            kino_page,
+                            download)
+                        VALUES ('{title}', '{description}', '{ocenka}', '{year}',
+                                '{poster}', '{tracker_page}', '{kino_page}', '{download}')
+                    """
+                )
+                logging.debug(f'Фильм {title} добавлен в базу данных')
+            for ganre in ganres:
+                self.insert_to_mediator('film_ganre', 'ganre', 'ganre_id', 'ganre_id',
+                                        'ganre_name', title, ganre)
+            for actor in actors:
+                self.insert_to_mediator('film_actors', 'actors', 'actors_id',
+                                        'actors_id', 'name', title, actor)
+            for country in countries:
+                self.insert_to_mediator('film_country', 'country', 'country_id',
+                                        'country_id', 'country', title, country)
+        else:
+            logging.info('Фильм уже есть в базе')
+
+    def insert_to_table(self, db_name, column_name, arr):
+        try:
+            with self.connection_to_db().cursor() as cursor:
+                for item in arr:
+                    if self.check_data_in_db(db_name, item, column_name):
+                        logging.info(f'Жанр {item} уже есть в базе')
+                        continue
+                    cursor.execute(
+                        f"""
+                            INSERT INTO {db_name} ({column_name})
+                            VALUES ('{item}')
+                        """
+                    )
+        except Exception as _e:
+            logging.error(f'Ошибка добавления значения: {_e}')
+
+    def insert_similar(self, title, download):
+        try:
+            if not self.check_data_in_db('similar_films', title, 'title'):
+                with self.connection_to_db().cursor() as cursor:
+                    cursor.execute(
+                        f"""
+                            INSERT INTO similar_films (film_id, title, download)
+                            VALUES ((SELECT id FROM films WHERE title LIKE '{title.split(')')[0]}%'), '{title}', '{download}')
+                        """
+                    )
+            else:
+                logging.info(f'Фильм {title} уже есть в списке похожих')
+        except Exception as _e:
+            logging.error(f'Ошибка добавления значения: {_e}')
