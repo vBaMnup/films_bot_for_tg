@@ -1,4 +1,4 @@
-# Проект API для Yatybe
+# Проект Film bot for TG
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://t.me/funanekdot)
 
