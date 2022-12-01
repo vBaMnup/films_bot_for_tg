@@ -4,15 +4,17 @@ import time
 
 import requests
 from bs4 import BeautifulSoup
+from requests import Session
 
-from config import TRACKER_DOMEN, TRACKER_PARSING_URL, TIMEOUT
+from tools.check_proxies import check_proxy
+from config import TRACKER_DOMEN, TRACKER_PARSING_URL, TIMEOUT, USE_PROXY
 from database.db_handler import Queue, Films
 from kp_parser import kino_main
 from tools.other import get_google_query, make_link
 from tools.user_agent import get_random_user_agent
 
 
-class ParserNoProxy:
+class Parser:
     def __init__(self):
         self.queue = Queue()
         self.queue.clear_queue()
@@ -22,13 +24,19 @@ class ParserNoProxy:
         Получить список новых фильмов на трекере
         :return:
         """
+        if USE_PROXY:
+            session = Session()
+            proxy = check_proxy(session, TRACKER_PARSING_URL)
+        else:
+            proxy = None
         while True:
             headers = get_random_user_agent()
             logging.info('Ищу новые фильмы в топе')
             try:
                 req = requests.get(TRACKER_PARSING_URL,
                                    headers=headers,
-                                   timeout=TIMEOUT).text
+                                   timeout=TIMEOUT,
+                                   proxies=proxy).text
                 logging.info('Получаю все ссылки')
                 soup = BeautifulSoup(req, 'lxml')
                 all_films = soup.findAll(True, {'class': ['gai', 'tum']})
@@ -100,7 +108,7 @@ def main():
     Основная логика программы
     :return:
     """
-    a = ParserNoProxy()
+    a = Parser()
     f = Films()
     q = Queue()
     film_id, title, link, download = a.get_next_film()
@@ -116,4 +124,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    while True:
+        main()
+        logging.info('Сплю 60 сек')
+
+        time.sleep(60)

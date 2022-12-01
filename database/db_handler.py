@@ -120,7 +120,6 @@ class Films:
         self.insert_to_table('ganre', 'ganre_name', ganres)
         self.insert_to_table('actors', 'name', actors)
         self.insert_to_table('country', 'country', countries)
-        self.insert_similar(title, download)
         if not self.check_data_in_db('films', title, 'title'):
             with self.connection_to_db().cursor() as cursor:
                 cursor.execute(

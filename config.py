@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
 # Нужно ли использовать прокси
-proxy = os.getenv('USE_PROXY')
+USE_PROXY = os.getenv('USE_PROXY')
 
 # сайт с прокси
 PROXY_URL = os.getenv('PROXY_URL')
@@ -36,3 +36,7 @@ host = os.getenv('PG_HOST')
 user = os.getenv('PG_USER')
 password = os.getenv('PG_PASSWORD')
 db_name = os.getenv('PG_DATABASE')
+
+# Данные для Telegram
+TOKEN = os.getenv('TG_TOKEN')
+CHANNEL_NAME = os.getenv('TG_NAME')

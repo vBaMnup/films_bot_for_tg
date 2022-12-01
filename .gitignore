@@ -129,3 +129,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /database/films.db
+
+# Parser kinopoisk
+tracker_parser.py

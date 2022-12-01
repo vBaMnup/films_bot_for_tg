@@ -175,6 +175,23 @@ class Table:
             )
         logging.info('Таблица similar_films успешно создана')
 
+    def drop_all(self):
+        with self.connection_to_db().cursor() as cursor:
+            cursor.execute(
+                """
+                    DROP TABLE film_actors;
+                    DROP TABLE film_country;
+                    DROP TABLE film_ganre;
+                    DROP TABLE similar_films;
+                    DROP TABLE actors;
+                    DROP TABLE country;
+                    DROP TABLE films;
+                    DROP TABLE ganre;
+                    DROP TABLE queue;
+                """
+            )
+            logging.info('Все таблицы уничтожены')
+
 
 if __name__ == '__main__':
     create_tables = Table()
@@ -188,3 +205,4 @@ if __name__ == '__main__':
     create_tables.create_film_country()
     create_tables.create_film_actors()
     create_tables.create_similar_films()
+    # create_tables.drop_all()

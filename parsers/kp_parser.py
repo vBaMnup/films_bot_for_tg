@@ -7,10 +7,9 @@ from requests import Session
 from selectolax.parser import HTMLParser
 
 from config import TIMEOUT
+from tools.check_proxies import LIST_BAD_PROXY
 from tools.proxy import get_proxies
 from tools.user_agent import get_random_user_agent
-
-LIST_BAD_PROXY = set()
 
 
 class Kparser:
@@ -89,7 +88,7 @@ class Kparser:
         if "aggregateRating" in data:
             ocenka = data.get("aggregateRating").get("ratingValue")
         else:
-            ocenka = '-'
+            ocenka = '0.0'
         if "image" in data:
             img = 'https:' + data.get("image").split(':')[1]
         else:
