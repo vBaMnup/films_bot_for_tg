@@ -33,3 +33,23 @@ def make_link(string: str) -> str:
     s: list = string.strip().split('/')
     kino_link: str = f'{s[0]}//{s[2]}/{s[3]}/{s[4]}/'
     return kino_link
+
+
+def make_text(title: str, ganre: str, country: str, description: str,
+              ocenka: str) -> str:
+    text: str = (f'<b>{title}</b>\n<b>Жанр</b>: {ganre}\n<b>Страна</b>: '
+                 f'{country}\nОписание:\n <i>{description}</i>\n\nОценка '
+                 f'кинопоиск: {ocenka}\n\n')
+    return text
+
+
+def check_text_to_wright_len(title: str, ganre: str, country: str,
+                             description: str, ocenka: str) -> str:
+    text: str = make_text(title, ganre, country, description, ocenka)
+    len_text: int = len(text)
+    if len_text <= 1024:
+        return text
+    difference = len_text - 1024
+    description = description[0:-difference]
+    text: str = make_text(title, ganre, country, description, ocenka)
+    return text
