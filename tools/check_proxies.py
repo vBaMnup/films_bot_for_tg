@@ -20,9 +20,9 @@ def check_proxy(session, url):
             random_proxy = {'http': proxy, 'https': proxy}
             try:
                 request = session.get(url,
-                                           headers=get_random_user_agent(),
-                                           proxies=random_proxy,
-                                           timeout=TIMEOUT)
+                                      headers=get_random_user_agent(),
+                                      proxies=random_proxy,
+                                      timeout=TIMEOUT)
                 if request.status_code != 200:
                     assert Exception(f'Прокси "{random_proxy}" '
                                      f'вернул не верный статус-код')

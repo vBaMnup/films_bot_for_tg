@@ -12,10 +12,11 @@ TODO:
 Жанры, страны, актеры Уникальны +
 """
 
-import psycopg2
 import logging
 
-from config import user, host, password, db_name
+import psycopg2
+
+from config import db_name, host, password, user
 
 
 class Table:

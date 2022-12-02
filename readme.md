@@ -1,6 +1,7 @@
 # Проект Film bot for TG
 
-[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://t.me/funanekdot)
+[![.github/workflows/films_bot.yml](https://github.com/vBaMnup/films_bot_for_tg/actions/workflows/films_bot.yml/badge.svg)](https://github.com/vBaMnup/films_bot_for_tg/actions/workflows/films_bot.yml)
+[Скриншот](https://github.com/vBaMnup/films_bot_for_tg/blob/main/img/film_bot.png)
 
 ### Описание
 Парсер новых фильмов на торрент трекере с возможностью постинга в телеграм-канал.

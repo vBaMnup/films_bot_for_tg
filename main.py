@@ -12,7 +12,8 @@ TODO:
 from asyncio import sleep as asleep
 
 import telebot
-from config import TOKEN, CHANNEL_NAME
+
+from config import CHANNEL_NAME, TOKEN
 from parsers.tracker_parser import main as search_main
 
 bot = telebot.TeleBot(TOKEN)

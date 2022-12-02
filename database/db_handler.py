@@ -1,8 +1,9 @@
 import logging
-import psycopg2
 from datetime import datetime
 
-from config import user, password, host, db_name
+import psycopg2
+
+from config import db_name, host, password, user
 
 
 class Queue:

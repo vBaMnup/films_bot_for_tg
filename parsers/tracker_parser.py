@@ -4,12 +4,12 @@ import time
 
 import requests
 from bs4 import BeautifulSoup
+from kp_parser import kino_main
 from requests import Session
 
+from config import TIMEOUT, TRACKER_DOMEN, TRACKER_PARSING_URL, USE_PROXY
+from database.db_handler import Films, Queue
 from tools.check_proxies import check_proxy
-from config import TRACKER_DOMEN, TRACKER_PARSING_URL, TIMEOUT, USE_PROXY
-from database.db_handler import Queue, Films
-from kp_parser import kino_main
 from tools.other import get_google_query, make_link
 from tools.user_agent import get_random_user_agent
 
@@ -61,7 +61,8 @@ class Parser:
         :return: id, название, ссылку на трекере, магнет-ссылку из очереди
         """
         self.get_films()
-        film_id, title, tracker_link, download = self.queue.get_next_film_from_queue()
+        film_id, title, tracker_link, download = (self.queue
+                                                  .get_next_film_from_queue())
         return film_id, title, tracker_link, download
 
     def search_kplink_in_google(self, google_url, title):
@@ -117,7 +118,8 @@ def main():
     else:
         google_query = get_google_query(title)
         kp_link = a.search_kplink_in_google(google_query, title)
-        name, description, ocenka, img, ganr, country, year, actors = kino_main(kp_link)
+        name, description, ocenka, img, ganr, country, year, actors = (
+            kino_main(kp_link))
         f.insert_to_films(title, description, float(ocenka), year, img, link,
                           kp_link, download, ganr, actors, country)
     q.change_handled(film_id)
