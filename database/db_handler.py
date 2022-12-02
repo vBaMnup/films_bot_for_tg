@@ -222,3 +222,13 @@ class Films:
                 """
             )
             return [item[0] for item in cursor]
+
+    def change_posted(self, film_id):
+        with self.connection_to_db().cursor() as cursor:
+            cursor.execute(
+                f"""
+                    UPDATE films
+                    SET posted = TRUE
+                    WHERE id = {film_id}
+                """
+            )

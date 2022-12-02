@@ -113,23 +113,22 @@ def main():
     Основная логика программы
     :return:
     """
-    while True:
-        a = Parser()
-        counter: int = 0
-        while counter <= 5:
-            f = Films()
-            film_id, title, link, download = a.get_next_film()
-            if f.check_data_in_db('films', title, 'title'):
-                f.insert_similar(title, download)
-            else:
-                google_query = get_google_query(title)
-                kp_link = a.search_kplink_in_google(google_query, title)
-                (name, description, ocenka,
-                 img, ganr, country, year, actors) = (kino_main(kp_link))
-                f.insert_to_films(title, description, float(ocenka), year,
-                                  img, link, kp_link, download, ganr, actors,
-                                  country)
-            a.queue.change_handled(film_id)
+    a = Parser()
+    counter: int = 0
+    while counter <= 5:
+        f = Films()
+        film_id, title, link, download = a.get_next_film()
+        if f.check_data_in_db('films', title, 'title'):
+            f.insert_similar(title, download)
+        else:
+            google_query = get_google_query(title)
+            kp_link = a.search_kplink_in_google(google_query, title)
+            (name, description, ocenka,
+             img, ganr, country, year, actors) = (kino_main(kp_link))
+            f.insert_to_films(title, description, float(ocenka), year,
+                              img, link, kp_link, download, ganr, actors,
+                              country)
+        a.queue.change_handled(film_id)
 
 
 if __name__ == '__main__':
