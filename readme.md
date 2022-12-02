@@ -2,9 +2,7 @@
 
 [![films_bot workflow](https://github.com/vBaMnup/films_bot_for_tg/actions/workflows/films_bot.yml/badge.svg)](https://github.com/vBaMnup/films_bot_for_tg/actions/workflows/films_bot.yml)
 
-[![Скриншот](https://github.
-com/vBaMnup/films_bot_for_tg/blob/119b610faa6f0dffd4380378167762325cbb12f8
-/img/film_bot.png)](https://t.me/funanekdot)
+![Скриншот](https://github.com/vBaMnup/films_bot_for_tg/blob/119b610faa6f0dffd4380378167762325cbb12f8/img/film_bot.png)
 
 ### Описание
 Парсер новых фильмов на торрент трекере с возможностью постинга в телеграм-канал.

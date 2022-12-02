@@ -4,15 +4,16 @@ import time
 
 import requests
 from bs4 import BeautifulSoup
-from .kp_parser import kino_main
-from requests import Session
 from psycopg2 import errors
+from requests import Session
 
 from config import TIMEOUT, TRACKER_DOMEN, TRACKER_PARSING_URL, USE_PROXY
 from database.db_handler import Films, Queue
 from tools.check_proxies import check_proxy
 from tools.other import get_google_query, make_link
 from tools.user_agent import get_random_user_agent
+
+from .kp_parser import kino_main
 
 
 class Parser:
@@ -55,7 +56,7 @@ class Parser:
             except errors.UniqueViolation:
                 return True
             except Exception as e:
-                logging.error(f'Ошибка получения списка фильмов {e}, {type(e)}')
+                logging.error(f'Ошибка получения списка фильмов {e}')
                 time.sleep(300)
 
     def get_next_film(self):

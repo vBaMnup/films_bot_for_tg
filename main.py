@@ -14,8 +14,8 @@ from asyncio import sleep as asleep
 import telebot
 
 from config import CHANNEL_NAME, TOKEN
-from parsers.tracker_parser import main as search_main
 from database.db_handler import Films
+from parsers.tracker_parser import main as search_main
 
 bot = telebot.TeleBot(TOKEN)
 channel = CHANNEL_NAME
