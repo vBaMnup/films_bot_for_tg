@@ -4,8 +4,9 @@ import time
 
 import requests
 from bs4 import BeautifulSoup
-from kp_parser import kino_main
+from .kp_parser import kino_main
 from requests import Session
+from psycopg2 import errors
 
 from config import TIMEOUT, TRACKER_DOMEN, TRACKER_PARSING_URL, USE_PROXY
 from database.db_handler import Films, Queue
@@ -51,9 +52,11 @@ class Parser:
                             .findNext('a').get('href'))
                     self.queue.insert_to_database(title, link, download)
                 return True
+            except errors.UniqueViolation:
+                return True
             except Exception as e:
-                logging.error(f'Ошибка получения списка фильмов {e}')
-                time.sleep(60)
+                logging.error(f'Ошибка получения списка фильмов {e}, {type(e)}')
+                time.sleep(300)
 
     def get_next_film(self):
         """
@@ -101,7 +104,7 @@ class Parser:
                             logging.info(f'Ура: {kino_link}')
                             return kino_link
                 logging.error('Отсутствует ссылка на кинопоиск, пробую еще...')
-                time.sleep(30)
+                time.sleep(60)
 
 
 def main():
@@ -109,25 +112,24 @@ def main():
     Основная логика программы
     :return:
     """
-    a = Parser()
-    f = Films()
-    q = Queue()
-    film_id, title, link, download = a.get_next_film()
-    if f.check_data_in_db('films', title, 'title'):
-        f.insert_similar(title, download)
-    else:
-        google_query = get_google_query(title)
-        kp_link = a.search_kplink_in_google(google_query, title)
-        name, description, ocenka, img, ganr, country, year, actors = (
-            kino_main(kp_link))
-        f.insert_to_films(title, description, float(ocenka), year, img, link,
-                          kp_link, download, ganr, actors, country)
-    q.change_handled(film_id)
+    while True:
+        a = Parser()
+        counter: int = 0
+        while counter <= 5:
+            f = Films()
+            film_id, title, link, download = a.get_next_film()
+            if f.check_data_in_db('films', title, 'title'):
+                f.insert_similar(title, download)
+            else:
+                google_query = get_google_query(title)
+                kp_link = a.search_kplink_in_google(google_query, title)
+                (name, description, ocenka,
+                 img, ganr, country, year, actors) = (kino_main(kp_link))
+                f.insert_to_films(title, description, float(ocenka), year,
+                                  img, link, kp_link, download, ganr, actors,
+                                  country)
+            a.queue.change_handled(film_id)
 
 
 if __name__ == '__main__':
-    while True:
-        main()
-        logging.info('Сплю 60 сек')
-
-        time.sleep(60)
+    main()

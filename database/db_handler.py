@@ -180,3 +180,45 @@ class Films:
                 logging.info(f'Фильм {title} уже есть в списке похожих')
         except Exception as _e:
             logging.error(f'Ошибка добавления значения: {_e}')
+
+    def get_film_from_db(self):
+        with self.connection_to_db().cursor() as cursor:
+            cursor.execute(
+                """
+                    SELECT id, title, description, ocenka, poster, download
+                    FROM films
+                    WHERE posted = FALSE
+                    LIMIT 1;
+                """
+            )
+            return cursor.fetchone()
+
+    def get_ganre_by_id(self, id):
+        with self.connection_to_db().cursor() as cursor:
+            cursor.execute(
+                f"""
+                    SELECT ganre_name
+                    FROM ganre
+                    WHERE ganre_id IN (
+                        SELECT ganre_id
+                        FROM film_ganre
+                        WHERE film_id = {id}
+                    )
+                """
+            )
+            return [item[0] for item in cursor]
+
+    def get_country_by_id(self, id):
+        with self.connection_to_db().cursor() as cursor:
+            cursor.execute(
+                f"""
+                    SELECT country
+                    FROM country
+                    WHERE country_id IN (
+                        SELECT country_id
+                        FROM film_country
+                        WHERE film_id = {id}
+                    )
+                """
+            )
+            return [item[0] for item in cursor]

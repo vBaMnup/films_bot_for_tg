@@ -48,7 +48,7 @@ class Table:
                 """
                     CREATE TABLE queue(id serial PRIMARY KEY,
                     title VARCHAR(1000),
-                    link VARCHAR(1000),
+                    link VARCHAR(1000) UNIQUE,
                     download VARCHAR(1000),
                     handled BOOLEAN NOT NULL);
                 """
